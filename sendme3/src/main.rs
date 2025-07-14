@@ -2,13 +2,11 @@ use std::{collections::BTreeSet, env, ops::Deref, path::PathBuf, process, str::F
 
 use anyhow::{ensure, Context, Result};
 use futures::StreamExt;
-use iroh::{protocol::Router, Endpoint};
+use iroh::{protocol::Router, Endpoint, Watcher};
 use iroh_blobs::{
-    api::{
-        downloader::{DownloadOptions, Shuffled, SplitStrategy},
-    },
+    api::downloader::{DownloadOptions, Shuffled, SplitStrategy},
     format::collection::Collection,
-    net_protocol::Blobs,
+    BlobsProtocol,
     store::fs::FsStore,
     ticket::BlobTicket,
 };
@@ -44,7 +42,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let ep = Endpoint::builder().secret_key(secret_key).bind().await?;
 
     let node_id = ep.node_id();
-    let addr = ep.node_addr().await?;
+    let addr = ep.node_addr().initialized().await?;
 
     println!("Node ID: {}", node_id);
     println!("Full address: {:?}", addr);
@@ -66,7 +64,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let router = Router::builder(ep.clone())
         .accept(
             iroh_blobs::ALPN,
-            Blobs::new(&blobs, ep.clone(), Some(dump_sender)),
+            BlobsProtocol::new(&blobs, ep.clone(), Some(dump_sender)),
         )
         .spawn();
 

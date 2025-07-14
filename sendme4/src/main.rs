@@ -2,20 +2,16 @@ use std::{env, ops::Deref, path::PathBuf, process, str::FromStr, time::Duration}
 
 use anyhow::{ensure, Context, Result};
 use futures::StreamExt;
-use iroh::{discovery, protocol::Router, Endpoint, NodeId, SecretKey};
+use iroh::{discovery, protocol::Router, Endpoint, NodeId, SecretKey, Watcher};
 use iroh_blobs::{
-    api::{
-        downloader::{DownloadOptions, SplitStrategy},
-    },
+    api::downloader::{DownloadOptions, SplitStrategy},
     format::collection::Collection,
-    net_protocol::Blobs,
+    BlobsProtocol,
     store::fs::FsStore,
     ticket::BlobTicket,
     HashAndFormat,
 };
-use iroh_content_discovery::protocol::{
-    AbsoluteTime, Announce, AnnounceKind, SignedAnnounce,
-};
+use iroh_content_discovery::protocol::{AbsoluteTime, Announce, AnnounceKind, SignedAnnounce};
 use tracing::{info, trace, warn};
 use util::{create_recv_dir, create_send_dir, TrackerDiscovery};
 
@@ -40,9 +36,7 @@ async fn announce_task(content: HashAndFormat, ep: Endpoint, secret_key: SecretK
         };
         let signed_announce = SignedAnnounce::new(announce, &secret_key)?;
         println!("Announcing: {:?}", signed_announce);
-        if let Err(cause) =
-            iroh_content_discovery::announce(&ep, tracker, signed_announce).await
-        {
+        if let Err(cause) = iroh_content_discovery::announce(&ep, tracker, signed_announce).await {
             warn!("Failed to send announce {:?}", cause);
             tokio::time::sleep(Duration::from_secs(5)).await;
             continue;
@@ -84,7 +78,7 @@ async fn share(path: PathBuf) -> Result<()> {
         .await?;
 
     let node_id = ep.node_id();
-    let addr = ep.node_addr().await?;
+    let addr = ep.node_addr().initialized().await?;
 
     println!("Node ID: {}", node_id);
     println!("Full address: {:?}", addr);
@@ -111,7 +105,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let router = Router::builder(ep.clone())
         .accept(
             iroh_blobs::ALPN,
-            Blobs::new(&blobs, ep.clone(), Some(dump_sender)),
+            BlobsProtocol::new(&blobs, ep.clone(), Some(dump_sender)),
         )
         .spawn();
 

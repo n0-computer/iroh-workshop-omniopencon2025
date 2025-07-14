@@ -1,7 +1,7 @@
 use std::{env, process, str::FromStr};
 
 use anyhow::{Context, Result};
-use iroh::{discovery, protocol::Router, Endpoint, NodeAddr};
+use iroh::{discovery, protocol::Router, Endpoint, NodeAddr, Watcher};
 use iroh_base::ticket::NodeTicket;
 use tokio::signal;
 use tracing::info;
@@ -24,7 +24,7 @@ async fn accept() -> Result<()> {
         .await?;
 
     let node_id = ep.node_id();
-    let addr = ep.node_addr().await?;
+    let addr = ep.node_addr().initialized().await?;
     let ticket = NodeTicket::from(addr.clone());
     let ticket_short = NodeTicket::from(NodeAddr::from(addr.node_id));
 
@@ -74,8 +74,12 @@ async fn connect(message: &str, ticket: &str) -> Result<()> {
     //
     // only resolve discovery, don't publish
     let ep = Endpoint::builder()
-        .add_discovery(|_| Some(discovery::pkarr::PkarrResolver::n0_dns()))
-        .add_discovery(|_| discovery::pkarr::dht::DhtDiscovery::builder().build().ok())
+        .add_discovery(discovery::pkarr::PkarrResolver::n0_dns())
+        .add_discovery(
+            discovery::pkarr::dht::DhtDiscovery::builder()
+                .build()
+                .unwrap(),
+        )
         .bind()
         .await?;
 

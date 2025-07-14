@@ -1,10 +1,8 @@
 use std::{env, path::PathBuf, process, str::FromStr};
 
 use anyhow::{ensure, Context, Result};
-use iroh::{protocol::Router, Endpoint};
-use iroh_blobs::{
-    net_protocol::Blobs, store::fs::FsStore, ticket::BlobTicket,
-};
+use iroh::{protocol::Router, Endpoint, Watcher};
+use iroh_blobs::{BlobsProtocol, store::fs::FsStore, ticket::BlobTicket};
 use tracing::info;
 use util::{crate_name, create_recv_dir, create_send_dir};
 
@@ -37,7 +35,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let ep = Endpoint::builder().secret_key(secret_key).bind().await?;
 
     let node_id = ep.node_id();
-    let addr = ep.node_addr().await?;
+    let addr = ep.node_addr().initialized().await?;
 
     println!("Node ID: {}", node_id);
     println!("Full address: {:?}", addr);
@@ -55,7 +53,7 @@ async fn share(path: PathBuf) -> Result<()> {
 
     // Create a router with the endpoint
     let router = Router::builder(ep.clone())
-        .accept(iroh_blobs::ALPN, Blobs::new(&blobs, ep.clone(), None))
+        .accept(iroh_blobs::ALPN, BlobsProtocol::new(&blobs, ep.clone(), None))
         .spawn();
 
     println!("Server is running. Press Ctrl+C to stop...");
@@ -95,10 +93,7 @@ async fn receive(target: &str, ticket: &str) -> Result<()> {
         .connect(ticket.node_addr().clone(), iroh_blobs::ALPN)
         .await?;
     info!("Getting blob");
-    let stats = store
-        .remote()
-        .fetch(conn, ticket.clone())
-        .await?;
+    let stats = store.remote().fetch(conn, ticket.clone()).await?;
     info!("Exporting file");
     let size = store.export(ticket.hash(), target.clone()).await?;
     info!("Exported file to {} with size: {}", target.display(), size);

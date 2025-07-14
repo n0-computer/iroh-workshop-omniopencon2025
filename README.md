@@ -1,4 +1,4 @@
-# Iroh and iroh-blobs workshop for MoneroKon 2025
+# Iroh and iroh-blobs workshop for Web3 Summit 2025
 
 [Slides](https://docs.google.com/presentation/d/e/2PACX-1vR6Zh-yEPxU_-Q3ZRjUCrA96FdH-hxrmNMabvghKH9QotQ8hSGos-jV9lr_EEyKYlwzhooeL1xtyLAs/pub?start=false&loop=false&delayms=3000)
 

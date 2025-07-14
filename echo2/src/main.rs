@@ -1,7 +1,7 @@
 use std::{env, process, str::FromStr};
 
 use anyhow::{Context, Result};
-use iroh::{protocol::Router, Endpoint};
+use iroh::{protocol::Router, Endpoint, Watcher};
 use iroh_base::ticket::NodeTicket;
 use tokio::signal;
 use tracing::info;
@@ -22,7 +22,7 @@ async fn accept() -> Result<()> {
         .await?;
 
     let node_id = ep.node_id();
-    let addr = ep.node_addr().await?;
+    let addr = ep.node_addr().initialized().await?;
     let ticket = NodeTicket::from(addr.clone());
 
     println!("Node ID: {}", node_id);
