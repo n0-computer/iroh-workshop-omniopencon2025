@@ -1,8 +1,9 @@
 use std::{env, str::FromStr};
 
 use anyhow::{Context, Result};
-use iroh::PublicKey;
+use iroh::{PublicKey, Watcher};
 use iroh_base::SecretKey;
+use n0_future::StreamExt;
 use rand::thread_rng;
 
 /// Gets a secret key from the IROH_SECRET environment variable or generates a new random one.
@@ -26,4 +27,15 @@ pub fn get_or_generate_secret_key() -> Result<SecretKey> {
 /// Print public key (aka node id) as a z32 string, compatible with https://pkarr.org/
 pub fn z32_node_id(node_id: &PublicKey) -> String {
     zbase32::encode_full_bytes(node_id.as_bytes().as_slice())
+}
+
+pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
+    let mut stream = ep.node_addr().stream_updates_only();
+    loop {
+        if let Some(Some(addr)) = stream.next().await {
+            if addr.relay_url.is_some() {
+                return addr;
+            }
+        }
+    };
 }

@@ -25,7 +25,7 @@ impl ProtocolHandler for EchoProtocol {
             .read_to_end(1024)
             .await
             .map_err(AcceptError::from_err)?;
-        info!("Received message: {}", String::from_utf8_lossy(&msg));
+        println!("Received message: {}", String::from_utf8_lossy(&msg));
 
         // Echo the message back
         send_stream

@@ -90,12 +90,13 @@ cargo run -p sendme4
 
 <b>Note: the workshop is using an *alpha* version of iroh-blobs.</b>
 
-To inspect the
-docs, run the following command:
+The stable version of iroh and iroh-blobs is 0.35. The 0.9x series is changing
+rapidly as we work towards a 1.0 release.
 
-```
-cargo doc -p iroh-blobs --open
-```
+Docs are at https://docs.rs/iroh-blobs/latest/iroh_blobs/
 
 The stable version of iroh-blobs on crates.io has most of the same features, but
 the API has been restructured in preparation of releasing iroh-blobs 1.0.
+
+If you want to see an implementation of blake3 data transfer that has proper
+progress bars, check out https://github.com/n0-computer/sendme

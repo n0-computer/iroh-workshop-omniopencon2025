@@ -1,9 +1,11 @@
 use std::{env, process, str::FromStr};
 
 use anyhow::{Context, Result};
-use iroh::{Endpoint, Watcher};
+use iroh::Endpoint;
 use iroh_base::ticket::NodeTicket;
 use tracing::info;
+
+use crate::util::await_relay;
 
 mod util;
 
@@ -23,7 +25,7 @@ async fn accept() -> Result<()> {
         .await?;
 
     let node_id = ep.node_id();
-    let addr = ep.node_addr().initialized().await?;
+    let addr = await_relay(&ep).await;
     let ticket = NodeTicket::from(addr.clone());
 
     println!("Node ID: {}", node_id);
@@ -47,7 +49,7 @@ async fn accept() -> Result<()> {
 
     // Read the message
     let msg = recv_stream.read_to_end(1024).await?;
-    info!("Received message: {}", String::from_utf8_lossy(&msg));
+    println!("Received message: {}", String::from_utf8_lossy(&msg));
 
     // Echo the message back
     send_stream.write_all(&msg).await?;

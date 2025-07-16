@@ -1,8 +1,10 @@
 use std::{env, path::PathBuf, str::FromStr};
 
 use anyhow::{Context, Result};
+use iroh::Watcher;
 use iroh_base::SecretKey;
 use iroh_blobs::HashAndFormat;
+use n0_future::StreamExt;
 use rand::{thread_rng, Rng};
 
 /// Gets a secret key from the IROH_SECRET environment variable or generates a new random one.
@@ -43,4 +45,15 @@ pub fn create_recv_dir(content: HashAndFormat) -> Result<PathBuf> {
 
 pub fn crate_name() -> &'static str {
     env!("CARGO_CRATE_NAME")
+}
+
+pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
+    let mut stream = ep.node_addr().stream_updates_only();
+    loop {
+        if let Some(Some(addr)) = stream.next().await {
+            if addr.relay_url.is_some() {
+                return addr;
+            }
+        }
+    };
 }

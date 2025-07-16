@@ -6,6 +6,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use futures::StreamExt;
+use iroh::Watcher;
 use iroh_base::SecretKey;
 use iroh_blobs::{
     api::{Store, TempTag},
@@ -244,4 +245,15 @@ pub fn dump_provider_events() -> (
         }
     });
     (dump_task, tx)
+}
+
+pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
+    let mut stream = ep.node_addr().stream_updates_only();
+    loop {
+        if let Some(Some(addr)) = stream.next().await {
+            if addr.relay_url.is_some() {
+                return addr;
+            }
+        }
+    };
 }
