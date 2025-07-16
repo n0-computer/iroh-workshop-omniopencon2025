@@ -2,7 +2,7 @@
 
 [Slides](https://docs.google.com/presentation/d/e/2PACX-1vR5anKQBBwN69DDBcxKxO055Td39Dg_y5DZeQSgzcWRlmLOzbofGU_ThnteONllmO80gdlPoowLnhLi/pub?start=false&loop=false&delayms=3000)
 
-[Workshop walkthrough](https://hackmd.io/FIN0XGmUQLGUR1rrUCIeHA?view)
+[Workshop walkthrough](https://hackmd.io/@GMgEoX9mQWKh09CQ-JktgA/Ska1_pELgg)
 
 [Iroh doctor](https://crates.io/crates/iroh-doctor)
 
