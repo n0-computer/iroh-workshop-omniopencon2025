@@ -9,7 +9,10 @@ use futures::StreamExt;
 use iroh::Watcher;
 use iroh_base::SecretKey;
 use iroh_blobs::{
-    api::{Store, TempTag},
+    api::{
+        downloader::{DownloadProgessItem, DownloadProgress},
+        Store, TempTag,
+    },
     format::collection::Collection,
     provider::Event,
     HashAndFormat,
@@ -256,4 +259,20 @@ pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
             }
         }
     }
+}
+
+pub async fn show_download_progress(response: DownloadProgress) -> Result<()> {
+    let mut stream = response.stream().await?;
+    loop {
+        match stream.next().await {
+            Some(DownloadProgessItem::Progress(value)) => {
+                print!("\rProgress: {value}");
+            }
+            Some(x) => {
+                println!("\nProgress: {:?}", x);
+            }
+            None => break,
+        }
+    }
+    Ok(())
 }

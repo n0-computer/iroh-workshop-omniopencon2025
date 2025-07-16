@@ -3,7 +3,11 @@ use std::{env, path::PathBuf, str::FromStr};
 use anyhow::{Context, Result};
 use iroh::Watcher;
 use iroh_base::SecretKey;
-use iroh_blobs::HashAndFormat;
+use iroh_blobs::{
+    api::remote::{GetProgress, GetProgressItem},
+    get::Stats,
+    HashAndFormat,
+};
 use n0_future::StreamExt;
 use rand::{thread_rng, Rng};
 
@@ -57,6 +61,24 @@ pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
             if addr.relay_url.is_some() {
                 return addr;
             }
+        }
+    }
+}
+
+pub async fn show_fetch_progress(response: GetProgress) -> Result<Stats> {
+    let mut stream = response.stream();
+    loop {
+        match stream.next().await {
+            Some(GetProgressItem::Progress(value)) => {
+                print!("\rProgress: {value}");
+            }
+            Some(GetProgressItem::Error(e)) => {
+                return Err(e.into());
+            }
+            Some(GetProgressItem::Done(stats)) => {
+                return Ok(stats);
+            }
+            None => anyhow::bail!("Stream ended unexpectedly"),
         }
     }
 }

@@ -1,7 +1,6 @@
 use std::{collections::BTreeSet, env, ops::Deref, path::PathBuf, process, str::FromStr};
 
 use anyhow::{ensure, Context, Result};
-use futures::StreamExt;
 use iroh::{protocol::Router, Endpoint};
 use iroh_blobs::{
     api::downloader::{DownloadOptions, Shuffled, SplitStrategy},
@@ -13,7 +12,7 @@ use iroh_blobs::{
 use tracing::info;
 use util::{create_recv_dir, create_send_dir};
 
-use crate::util::await_relay;
+use crate::util::{await_relay, show_download_progress};
 
 mod util;
 
@@ -136,11 +135,7 @@ async fn receive(tickets: Vec<String>) -> Result<()> {
         Shuffled::new(nodes.into_iter().collect()),
         SplitStrategy::Split,
     );
-    // let mut stream = downloader.download(content, nodes).stream().await?;
-    let mut stream = downloader.download_with_opts(options).stream().await?;
-    while let Some(item) = stream.next().await {
-        println!("Received: {:?}", item);
-    }
+    show_download_progress(downloader.download_with_opts(options)).await?;
     info!("Exporting file");
     let collection = Collection::load(content.hash, store.deref()).await?;
     util::export(&store, collection).await?;

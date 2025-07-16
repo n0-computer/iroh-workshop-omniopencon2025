@@ -8,7 +8,7 @@ use iroh_blobs::{
 use tracing::info;
 use util::{crate_name, create_recv_dir, create_send_dir};
 
-use crate::util::await_relay;
+use crate::util::{await_relay, show_fetch_progress};
 
 mod util;
 
@@ -98,7 +98,7 @@ async fn receive(ticket: &str) -> Result<()> {
         .connect(ticket.node_addr().clone(), iroh_blobs::ALPN)
         .await?;
     info!("Getting hash sequence");
-    let stats = store.remote().fetch(conn, ticket.clone()).await?;
+    let stats = show_fetch_progress(store.remote().fetch(conn, ticket.clone())).await?;
     println!("Transfer stats: {:?}", stats);
     info!("Exporting file");
     let collection = Collection::load(ticket.hash(), store.deref()).await?;

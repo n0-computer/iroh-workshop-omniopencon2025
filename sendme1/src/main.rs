@@ -6,7 +6,7 @@ use iroh_blobs::{store::fs::FsStore, ticket::BlobTicket, BlobsProtocol};
 use tracing::info;
 use util::{crate_name, create_recv_dir, create_send_dir};
 
-use crate::util::await_relay;
+use crate::util::{await_relay, show_fetch_progress};
 
 mod util;
 
@@ -98,7 +98,7 @@ async fn receive(target: &str, ticket: &str) -> Result<()> {
         .connect(ticket.node_addr().clone(), iroh_blobs::ALPN)
         .await?;
     info!("Getting blob");
-    let stats = store.remote().fetch(conn, ticket.clone()).await?;
+    let stats = show_fetch_progress(store.remote().fetch(conn, ticket.clone())).await?;
     info!("Exporting file");
     let size = store.export(ticket.hash(), target.clone()).await?;
     info!("Exported file to {} with size: {}", target.display(), size);
