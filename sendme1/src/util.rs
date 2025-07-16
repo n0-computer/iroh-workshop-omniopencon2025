@@ -16,7 +16,10 @@ pub fn get_or_generate_secret_key() -> Result<SecretKey> {
     } else {
         // Generate a new random key
         let secret_key = SecretKey::generate(&mut thread_rng());
-        println!("Generated new secret key: {}", hex::encode(secret_key.to_bytes()));
+        println!(
+            "Generated new secret key: {}",
+            hex::encode(secret_key.to_bytes())
+        );
         println!("To reuse this key, set the IROH_SECRET environment variable to this value");
         Ok(secret_key)
     }
@@ -55,5 +58,5 @@ pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
                 return addr;
             }
         }
-    };
+    }
 }

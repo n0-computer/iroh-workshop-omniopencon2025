@@ -255,5 +255,5 @@ pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
                 return addr;
             }
         }
-    };
+    }
 }

@@ -6,9 +6,9 @@ use iroh::{protocol::Router, Endpoint};
 use iroh_blobs::{
     api::downloader::{DownloadOptions, Shuffled, SplitStrategy},
     format::collection::Collection,
-    BlobsProtocol,
     store::fs::FsStore,
     ticket::BlobTicket,
+    BlobsProtocol,
 };
 use tracing::info;
 use util::{create_recv_dir, create_send_dir};

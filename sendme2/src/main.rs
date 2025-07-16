@@ -3,7 +3,7 @@ use std::{env, ops::Deref, path::PathBuf, process, str::FromStr};
 use anyhow::{ensure, Context, Result};
 use iroh::{protocol::Router, Endpoint};
 use iroh_blobs::{
-    format::collection::Collection, BlobsProtocol, store::fs::FsStore, ticket::BlobTicket,
+    format::collection::Collection, store::fs::FsStore, ticket::BlobTicket, BlobsProtocol,
 };
 use tracing::info;
 use util::{crate_name, create_recv_dir, create_send_dir};
@@ -57,7 +57,10 @@ async fn share(path: PathBuf) -> Result<()> {
 
     // Create a router with the endpoint
     let router = Router::builder(ep.clone())
-        .accept(iroh_blobs::ALPN, BlobsProtocol::new(&blobs, ep.clone(), None))
+        .accept(
+            iroh_blobs::ALPN,
+            BlobsProtocol::new(&blobs, ep.clone(), None),
+        )
         .spawn();
 
     println!("Server is running. Press Ctrl+C to stop...");

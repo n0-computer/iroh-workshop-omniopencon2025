@@ -6,10 +6,9 @@ use iroh::{discovery, protocol::Router, Endpoint, NodeId, SecretKey};
 use iroh_blobs::{
     api::downloader::{DownloadOptions, SplitStrategy},
     format::collection::Collection,
-    BlobsProtocol,
     store::fs::FsStore,
     ticket::BlobTicket,
-    HashAndFormat,
+    BlobsProtocol, HashAndFormat,
 };
 use iroh_content_discovery::protocol::{AbsoluteTime, Announce, AnnounceKind, SignedAnnounce};
 use tracing::{info, trace, warn};
@@ -141,7 +140,11 @@ async fn receive(content: &str) -> Result<()> {
     // Create an endpoint
     let ep = Endpoint::builder()
         .add_discovery(discovery::pkarr::PkarrResolver::n0_dns())
-        .add_discovery(discovery::pkarr::dht::DhtDiscovery::builder().build().unwrap())
+        .add_discovery(
+            discovery::pkarr::dht::DhtDiscovery::builder()
+                .build()
+                .unwrap(),
+        )
         .bind()
         .await?;
 
