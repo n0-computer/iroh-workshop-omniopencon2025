@@ -138,8 +138,8 @@ async fn receive(content: &str) -> Result<()> {
 
     // Create an endpoint
     let ep = Endpoint::builder()
-        .add_discovery(|_| Some(discovery::pkarr::PkarrResolver::n0_dns()))
-        .add_discovery(|_| discovery::pkarr::dht::DhtDiscovery::builder().build().ok())
+        .add_discovery(discovery::pkarr::PkarrResolver::n0_dns())
+        .add_discovery(discovery::pkarr::dht::DhtDiscovery::builder().build().unwrap())
         .bind()
         .await?;
 

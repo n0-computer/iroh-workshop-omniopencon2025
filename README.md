@@ -1,6 +1,6 @@
 # Iroh and iroh-blobs workshop for Web3 Summit 2025
 
-[Slides](https://docs.google.com/presentation/d/e/2PACX-1vR6Zh-yEPxU_-Q3ZRjUCrA96FdH-hxrmNMabvghKH9QotQ8hSGos-jV9lr_EEyKYlwzhooeL1xtyLAs/pub?start=false&loop=false&delayms=3000)
+[Slides](https://docs.google.com/presentation/d/e/2PACX-1vR5anKQBBwN69DDBcxKxO055Td39Dg_y5DZeQSgzcWRlmLOzbofGU_ThnteONllmO80gdlPoowLnhLi/pub?start=false&loop=false&delayms=3000)
 
 [Workshop walkthrough](https://hackmd.io/RkVPciqHTH2eekd29pQYyQ?view)
 
@@ -12,15 +12,13 @@ iroh-doctor can be used to check connection status and performance. Install with
 
 <iroh.computer/discord> channel `#workshop`
 
-matrix room, for those that don't like discord: `#iroh-workshop:matrix.org`
-
 # Wifi
 
 You can use any wifi. You will *always* be able to establish a connection as long as you are connected to the internet in some way.
 
-I brought my own fast wifi for sending around a lot of data:
+Here is a phone hotspot in case conference wifi does not work:
 
-SSID: `iroh` or `iroh-5g`
+SSID: `iroh`
 Pass: `movethebytes`
 
 # Exercises
