@@ -28,14 +28,3 @@ pub fn get_or_generate_secret_key() -> Result<SecretKey> {
 pub fn z32_node_id(node_id: &PublicKey) -> String {
     zbase32::encode_full_bytes(node_id.as_bytes().as_slice())
 }
-
-pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
-    let mut stream = ep.node_addr().stream_updates_only();
-    loop {
-        if let Some(Some(addr)) = stream.next().await {
-            if addr.relay_url.is_some() {
-                return addr;
-            }
-        }
-    }
-}

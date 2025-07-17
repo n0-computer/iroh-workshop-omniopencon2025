@@ -311,17 +311,6 @@ impl ContentDiscovery for TrackerDiscovery {
     }
 }
 
-pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
-    let mut stream = ep.node_addr().stream_updates_only();
-    loop {
-        if let Some(Some(addr)) = stream.next().await {
-            if addr.relay_url.is_some() {
-                return addr;
-            }
-        }
-    }
-}
-
 pub async fn show_download_progress(response: DownloadProgress) -> Result<()> {
     let mut stream = response.stream().await?;
     loop {

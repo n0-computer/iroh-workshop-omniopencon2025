@@ -1,7 +1,7 @@
 use std::{env, ops::Deref, path::PathBuf, process, str::FromStr, time::Duration};
 
 use anyhow::{ensure, Context, Result};
-use iroh::{discovery, protocol::Router, Endpoint, NodeId, SecretKey};
+use iroh::{discovery, protocol::Router, Endpoint, NodeId, SecretKey, Watcher};
 use iroh_blobs::{
     api::downloader::{DownloadOptions, SplitStrategy},
     format::collection::Collection,
@@ -13,7 +13,7 @@ use iroh_content_discovery::protocol::{AbsoluteTime, Announce, AnnounceKind, Sig
 use tracing::{info, trace, warn};
 use util::{create_recv_dir, create_send_dir, TrackerDiscovery};
 
-use crate::util::{await_relay, show_download_progress};
+use crate::util::show_download_progress;
 
 mod util;
 
@@ -78,7 +78,8 @@ async fn share(path: PathBuf) -> Result<()> {
         .await?;
 
     let node_id = ep.node_id();
-    let addr = await_relay(&ep).await;
+    ep.home_relay().initialized().await?;
+    let addr = ep.node_addr().initialized().await?;
 
     println!("Node ID: {}", node_id);
     println!("Full address: {:?}", addr);

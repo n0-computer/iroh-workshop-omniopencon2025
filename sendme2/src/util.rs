@@ -198,17 +198,6 @@ pub fn crate_name() -> &'static str {
     env!("CARGO_CRATE_NAME")
 }
 
-pub async fn await_relay(ep: &iroh::Endpoint) -> iroh::NodeAddr {
-    let mut stream = ep.node_addr().stream_updates_only();
-    loop {
-        if let Some(Some(addr)) = stream.next().await {
-            if addr.relay_url.is_some() {
-                return addr;
-            }
-        }
-    }
-}
-
 pub async fn show_fetch_progress(response: GetProgress) -> Result<Stats> {
     let mut stream = response.stream();
     loop {
