@@ -42,8 +42,8 @@ async fn share(path: PathBuf) -> Result<()> {
     ep.home_relay().initialized().await?;
     let addr = ep.node_addr().initialized().await?;
 
-    println!("Node ID: {}", node_id);
-    println!("Full address: {:?}", addr);
+    println!("Node ID: {node_id}");
+    println!("Full address: {addr:?}");
 
     let tag = util::import(absolute_path.clone(), &blobs).await?;
     let ticket = BlobTicket::new(addr, *tag.hash(), tag.format());
@@ -100,7 +100,7 @@ async fn receive(ticket: &str) -> Result<()> {
         .await?;
     info!("Getting hash sequence");
     let stats = show_fetch_progress(store.remote().fetch(conn, ticket.clone())).await?;
-    println!("Transfer stats: {:?}", stats);
+    println!("Transfer stats: {stats:?}");
     info!("Exporting file");
     let collection = Collection::load(ticket.hash(), store.deref()).await?;
     util::export(&store, collection).await?;

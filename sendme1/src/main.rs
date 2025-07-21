@@ -40,8 +40,8 @@ async fn share(path: PathBuf) -> Result<()> {
     ep.home_relay().initialized().await?;
     let addr = ep.node_addr().initialized().await?;
 
-    println!("Node ID: {}", node_id);
-    println!("Full address: {:?}", addr);
+    println!("Node ID: {node_id}");
+    println!("Full address: {addr:?}");
 
     let tag = blobs.add_path(&absolute_path).await?;
     let ticket = BlobTicket::new(addr, tag.hash, tag.format);
@@ -103,7 +103,7 @@ async fn receive(target: &str, ticket: &str) -> Result<()> {
     info!("Exporting file");
     let size = store.export(ticket.hash(), target.clone()).await?;
     info!("Exported file to {} with size: {}", target.display(), size);
-    println!("Transfer stats: {:?}", stats);
+    println!("Transfer stats: {stats:?}");
 
     // close the endpoint, just to be nice
     ep.close().await;

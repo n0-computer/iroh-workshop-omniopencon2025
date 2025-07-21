@@ -29,10 +29,10 @@ async fn accept() -> Result<()> {
     let ticket = NodeTicket::from(addr.clone());
     let ticket_short = NodeTicket::from(NodeAddr::from(addr.node_id));
 
-    println!("Node ID: {}", node_id);
-    println!("Full address: {:?}", addr);
-    println!("Ticket: {}", ticket);
-    println!("Short ticket: {}", ticket_short);
+    println!("Node ID: {node_id}");
+    println!("Full address: {addr:?}");
+    println!("Ticket: {ticket}");
+    println!("Short ticket: {ticket_short}");
     println!(
         "To connect, use: {} connect <message> {}",
         env::args().next().unwrap_or_default(),
@@ -40,9 +40,8 @@ async fn accept() -> Result<()> {
     );
     println!("To see the info published on DNS, run:");
     println!(
-        "dig TXT @dns.iroh.link _iroh.{}.{}",
-        z32_node_id(&addr.node_id),
-        "dns.iroh.link"
+        "dig TXT @dns.iroh.link _iroh.{}.dns.iroh.link",
+        z32_node_id(&addr.node_id)
     );
     println!("To see the info published on the mainline DHT, open:");
     println!("https://app.pkarr.org/?pk={}", z32_node_id(&addr.node_id));

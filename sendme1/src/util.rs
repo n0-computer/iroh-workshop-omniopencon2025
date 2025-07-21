@@ -1,7 +1,6 @@
 use std::{env, path::PathBuf, str::FromStr};
 
 use anyhow::{Context, Result};
-use iroh::Watcher;
 use iroh_base::SecretKey;
 use iroh_blobs::{
     api::remote::{GetProgress, GetProgressItem},

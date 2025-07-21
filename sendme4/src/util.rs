@@ -272,7 +272,7 @@ impl ContentDiscovery for TrackerDiscovery {
         let content = content.to_string();
         let (tx, rx) = tokio::sync::mpsc::channel(10);
         let ep = self.endpoint.clone();
-        let tracker = self.tracker.clone();
+        let tracker = self.tracker;
         tokio::spawn(async move {
             loop {
                 let query = Query {
@@ -282,10 +282,10 @@ impl ContentDiscovery for TrackerDiscovery {
                         verified: true,
                     },
                 };
-                println!("Querying tracker: {:?}", query);
+                println!("Querying tracker: {query:?}");
                 match iroh_content_discovery::query(&ep, tracker, query).await {
                     Ok(announces) => {
-                        println!("Received query result: {:?}", announces);
+                        println!("Received query result: {announces:?}");
                         for announce in announces {
                             if tx.send(announce.host).await.is_err() {
                                 break;
@@ -293,7 +293,7 @@ impl ContentDiscovery for TrackerDiscovery {
                         }
                     }
                     Err(cause) => {
-                        println!("Failed to send query {:?}", cause);
+                        println!("Failed to send query {cause:?}");
                         tokio::time::sleep(Duration::from_secs(5)).await;
                         continue;
                     }
@@ -302,11 +302,7 @@ impl ContentDiscovery for TrackerDiscovery {
         });
         Box::pin(futures::stream::unfold(rx, |mut rx| async move {
             let item = rx.recv().await;
-            if let Some(item) = item {
-                Some((item, rx))
-            } else {
-                None
-            }
+            item.map(|item| (item, rx))
         }))
     }
 }
@@ -319,7 +315,7 @@ pub async fn show_download_progress(response: DownloadProgress) -> Result<()> {
                 print!("\rProgress: {value}");
             }
             Some(x) => {
-                println!("\nProgress: {:?}", x);
+                println!("\nProgress: {x:?}");
             }
             None => break,
         }

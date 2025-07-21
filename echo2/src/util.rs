@@ -1,9 +1,7 @@
 use std::{env, str::FromStr};
 
 use anyhow::{Context, Result};
-use iroh::Watcher;
 use iroh_base::SecretKey;
-use n0_future::StreamExt;
 use rand::thread_rng;
 
 /// Gets a secret key from the IROH_SECRET environment variable or generates a new random one.

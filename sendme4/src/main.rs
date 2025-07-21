@@ -35,7 +35,7 @@ async fn announce_task(content: HashAndFormat, ep: Endpoint, secret_key: SecretK
             timestamp: AbsoluteTime::now(),
         };
         let signed_announce = SignedAnnounce::new(announce, &secret_key)?;
-        println!("Announcing: {:?}", signed_announce);
+        println!("Announcing: {signed_announce:?}");
         if let Err(cause) = iroh_content_discovery::announce(&ep, tracker, signed_announce).await {
             warn!("Failed to send announce {:?}", cause);
             tokio::time::sleep(Duration::from_secs(5)).await;
@@ -81,8 +81,8 @@ async fn share(path: PathBuf) -> Result<()> {
     ep.home_relay().initialized().await?;
     let addr = ep.node_addr().initialized().await?;
 
-    println!("Node ID: {}", node_id);
-    println!("Full address: {:?}", addr);
+    println!("Node ID: {node_id}");
+    println!("Full address: {addr:?}");
 
     let tag = util::import(absolute_path.clone(), &blobs).await?;
     let announce_task = tokio::spawn(announce_task(

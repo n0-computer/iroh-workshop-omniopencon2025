@@ -46,8 +46,8 @@ async fn share(path: PathBuf) -> Result<()> {
     ep.home_relay().initialized().await?;
     let addr = ep.node_addr().initialized().await?;
 
-    println!("Node ID: {}", node_id);
-    println!("Full address: {:?}", addr);
+    println!("Node ID: {node_id}");
+    println!("Full address: {addr:?}");
 
     let tag = util::import(absolute_path.clone(), &blobs).await?;
     let ticket = BlobTicket::new(addr, *tag.hash(), tag.format());
@@ -116,7 +116,7 @@ async fn receive(tickets: Vec<String>) -> Result<()> {
         .collect::<BTreeSet<_>>();
 
     // Create a blob store
-    let blobs_path = create_recv_dir(content.clone())?;
+    let blobs_path = create_recv_dir(content)?;
     let store = FsStore::load(&blobs_path).await?;
 
     // Create an endpoint

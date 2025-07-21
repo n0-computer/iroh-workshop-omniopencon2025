@@ -27,9 +27,9 @@ async fn accept() -> Result<()> {
     let addr = ep.node_addr().initialized().await?;
     let ticket = NodeTicket::from(addr.clone());
 
-    println!("Node ID: {}", node_id);
-    println!("Full address: {:?}", addr);
-    println!("Ticket: {}", ticket);
+    println!("Node ID: {node_id}");
+    println!("Full address: {addr:?}");
+    println!("Ticket: {ticket}");
     println!(
         "To connect, use: {} connect <message> {}",
         env::args().next().unwrap_or_default(),
