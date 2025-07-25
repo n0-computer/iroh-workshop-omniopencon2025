@@ -38,13 +38,18 @@ async fn accept() -> Result<()> {
         env::args().next().unwrap_or_default(),
         ticket
     );
-    println!("To see the info published on DNS, run:");
-    println!(
-        "dig TXT @dns.iroh.link _iroh.{}.dns.iroh.link",
-        z32_node_id(&addr.node_id)
-    );
+    let znodeid = z32_node_id(&addr.node_id);
+    println!("\nDNS based node discovery");
+    println!("To see the info published on DNS, open:");
+    println!("https://digwebinterface.com/?hostnames=_iroh.{znodeid}.dns.iroh.link&type=TXT&ns=self&nameservers=dns.iroh.link");
+    println!("Or use the command line:");
+    println!("dig TXT @dns.iroh.link _iroh.{znodeid}.dns.iroh.link",);
+    println!("\nDHT based node discovery");
     println!("To see the info published on the mainline DHT, open:");
-    println!("https://app.pkarr.org/?pk={}", z32_node_id(&addr.node_id));
+    println!("https://app.pkarr.org/?pk={znodeid}");
+    println!("Or use the command line:");
+    println!("cargo install pkarr-cli");
+    println!("pkarr resolve {znodeid}");
 
     // Create a router with the endpoint
     let router = Router::builder(ep)

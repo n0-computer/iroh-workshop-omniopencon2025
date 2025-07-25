@@ -7,7 +7,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use futures::StreamExt;
-use iroh::{Endpoint, NodeId, Watcher};
+use iroh::{Endpoint, NodeId};
 use iroh_base::SecretKey;
 use iroh_blobs::{
     api::{
