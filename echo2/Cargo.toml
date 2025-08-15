@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iroh = { version = "0.90", features = ["metrics"] }
-iroh-base = "0.90"
+iroh = { version = "0.91.1", features = ["metrics"] }
+iroh-base = "0.91.1"
 tokio = { version = "1.0", features = ["full"] }
 anyhow = "1.0"
 tracing = "0.1"

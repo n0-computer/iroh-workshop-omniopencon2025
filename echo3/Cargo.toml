@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iroh = { version = "0.90", features = ["metrics", "discovery-pkarr-dht"], git = "https://github.com/n0-computer/iroh" }
-iroh-base = { version = "0.90", git = "https://github.com/n0-computer/iroh" }
+iroh = { version = "0.91.1", features = ["metrics", "discovery-pkarr-dht"] }
+iroh-base = { version = "0.91.1" }
 tokio = { version = "1.0", features = ["full"] }
 anyhow = "1.0"
 tracing = "0.1"

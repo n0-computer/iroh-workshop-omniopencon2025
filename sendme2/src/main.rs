@@ -39,8 +39,8 @@ async fn share(path: PathBuf) -> Result<()> {
     let ep = Endpoint::builder().secret_key(secret_key).bind().await?;
 
     let node_id = ep.node_id();
-    ep.home_relay().initialized().await?;
-    let addr = ep.node_addr().initialized().await?;
+    ep.home_relay().initialized().await;
+    let addr = ep.node_addr().initialized().await;
 
     println!("Node ID: {node_id}");
     println!("Full address: {addr:?}");
