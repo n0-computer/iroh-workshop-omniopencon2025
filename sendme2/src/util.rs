@@ -16,7 +16,7 @@ use iroh_blobs::{
     get::Stats,
     HashAndFormat,
 };
-use rand::{thread_rng, Rng};
+use rand::{rng, Rng};
 use walkdir::WalkDir;
 
 /// Gets a secret key from the IROH_SECRET environment variable or generates a new random one.
@@ -27,7 +27,7 @@ pub fn get_or_generate_secret_key() -> Result<SecretKey> {
         SecretKey::from_str(&secret).context("Invalid secret key format")
     } else {
         // Generate a new random key
-        let secret_key = SecretKey::generate(&mut thread_rng());
+        let secret_key = SecretKey::generate(&mut rng());
         println!(
             "Generated new secret key: {}",
             hex::encode(secret_key.to_bytes())
@@ -39,7 +39,7 @@ pub fn get_or_generate_secret_key() -> Result<SecretKey> {
 
 /// Create a unique directory for sending files.
 pub fn create_send_dir() -> Result<PathBuf> {
-    let suffix = rand::thread_rng().gen::<[u8; 16]>();
+    let suffix = rand::rng().random::<[u8; 16]>();
     let cwd = std::env::current_dir()?;
     let blobs_data_dir = cwd.join(format!(".{}-send-{}", crate_name(), hex::encode(suffix)));
     if blobs_data_dir.exists() {

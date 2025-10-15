@@ -1,7 +1,7 @@
 use std::{env, ops::Deref, path::PathBuf, process, str::FromStr};
 
 use anyhow::{ensure, Context, Result};
-use iroh::{protocol::Router, Endpoint, Watcher};
+use iroh::{protocol::Router, Endpoint};
 use iroh_blobs::{
     format::collection::Collection, store::fs::FsStore, ticket::BlobTicket, BlobsProtocol,
 };
@@ -39,14 +39,14 @@ async fn share(path: PathBuf) -> Result<()> {
     let ep = Endpoint::builder().secret_key(secret_key).bind().await?;
 
     let node_id = ep.node_id();
-    ep.home_relay().initialized().await;
-    let addr = ep.node_addr().initialized().await;
+    ep.online().await;
+    let addr = ep.node_addr();
 
     println!("Node ID: {node_id}");
     println!("Full address: {addr:?}");
 
     let tag = util::import(absolute_path.clone(), &blobs).await?;
-    let ticket = BlobTicket::new(addr, *tag.hash(), tag.format());
+    let ticket = BlobTicket::new(addr, tag.hash(), tag.format());
     println!("Sharing {}", absolute_path.display());
     println!("Hash: {}", tag.hash());
     println!(
@@ -60,7 +60,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let router = Router::builder(ep.clone())
         .accept(
             iroh_blobs::ALPN,
-            BlobsProtocol::new(&blobs, ep.clone(), None),
+            BlobsProtocol::new(&blobs, None),
         )
         .spawn();
 

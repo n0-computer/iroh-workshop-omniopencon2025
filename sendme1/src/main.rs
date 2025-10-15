@@ -1,7 +1,7 @@
 use std::{env, path::PathBuf, process, str::FromStr};
 
 use anyhow::{ensure, Context, Result};
-use iroh::{protocol::Router, Endpoint, Watcher};
+use iroh::{protocol::Router, Endpoint};
 use iroh_blobs::{store::fs::FsStore, ticket::BlobTicket, BlobsProtocol};
 use tracing::info;
 use util::{crate_name, create_recv_dir, create_send_dir};
@@ -37,8 +37,8 @@ async fn share(path: PathBuf) -> Result<()> {
     let ep = Endpoint::builder().secret_key(secret_key).bind().await?;
 
     let node_id = ep.node_id();
-    ep.home_relay().initialized().await;
-    let addr = ep.node_addr().initialized().await;
+    ep.online().await;
+    let addr = ep.node_addr();
 
     println!("Node ID: {node_id}");
     println!("Full address: {addr:?}");
@@ -58,7 +58,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let router = Router::builder(ep.clone())
         .accept(
             iroh_blobs::ALPN,
-            BlobsProtocol::new(&blobs, ep.clone(), None),
+            BlobsProtocol::new(&blobs, None),
         )
         .spawn();
 

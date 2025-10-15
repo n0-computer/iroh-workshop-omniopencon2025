@@ -4,15 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iroh = { version = "0.90", features = ["metrics"] }
-iroh-base = "0.90"
-iroh-blobs = "0.91"
+iroh = { version = "0.93.2", features = ["metrics"] }
+iroh-base = "0.93.2"
+iroh-blobs = "0.95"
 tokio = { version = "1.0", features = ["full"] }
 anyhow = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 base64 = "0.21"
-rand = "0.8.5" 
+rand = "0.5" 
 hex = "0.4.3"
 num_cpus = "1.16.0"
 walkdir = "2.5.0"
