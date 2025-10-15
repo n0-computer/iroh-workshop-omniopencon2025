@@ -56,10 +56,7 @@ async fn share(path: PathBuf) -> Result<()> {
 
     // Create a router with the endpoint
     let router = Router::builder(ep.clone())
-        .accept(
-            iroh_blobs::ALPN,
-            BlobsProtocol::new(&blobs, None),
-        )
+        .accept(iroh_blobs::ALPN, BlobsProtocol::new(&blobs, None))
         .spawn();
 
     println!("Server is running. Press Ctrl+C to stop...");

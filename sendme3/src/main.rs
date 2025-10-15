@@ -1,7 +1,7 @@
 use std::{collections::BTreeSet, env, ops::Deref, path::PathBuf, process, str::FromStr};
 
 use anyhow::{ensure, Context, Result};
-use iroh::{protocol::Router, Endpoint, Watcher};
+use iroh::{discovery::static_provider::StaticProvider, protocol::Router, Endpoint};
 use iroh_blobs::{
     api::downloader::{DownloadOptions, Shuffled, SplitStrategy},
     format::collection::Collection,
@@ -43,14 +43,14 @@ async fn share(path: PathBuf) -> Result<()> {
     let ep = Endpoint::builder().secret_key(secret_key).bind().await?;
 
     let node_id = ep.node_id();
-    ep.home_relay().initialized().await;
-    let addr = ep.node_addr().initialized().await;
+    ep.online().await;
+    let addr = ep.node_addr();
 
     println!("Node ID: {node_id}");
     println!("Full address: {addr:?}");
 
     let tag = util::import(absolute_path.clone(), &blobs).await?;
-    let ticket = BlobTicket::new(addr, *tag.hash(), tag.format());
+    let ticket = BlobTicket::new(addr, tag.hash(), tag.format());
     println!("Sharing {}", absolute_path.display());
     println!("Hash: {}", tag.hash());
     println!(
@@ -66,7 +66,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let router = Router::builder(ep.clone())
         .accept(
             iroh_blobs::ALPN,
-            BlobsProtocol::new(&blobs, ep.clone(), Some(dump_sender)),
+            BlobsProtocol::new(&blobs, Some(dump_sender)),
         )
         .spawn();
 
@@ -120,11 +120,12 @@ async fn receive(tickets: Vec<String>) -> Result<()> {
     let store = FsStore::load(&blobs_path).await?;
 
     // Create an endpoint
-    let ep = Endpoint::builder().bind().await?;
+    let sp = StaticProvider::new();
+    let ep = Endpoint::builder().discovery(sp.clone()).bind().await?;
 
     // add the connection information contained in the tickets to the endpoint
     for ticket in tickets {
-        ep.add_node_addr(ticket.node_addr().clone())?;
+        sp.add_node_info(ticket.node_addr().clone());
     }
 
     // Connect to the node
