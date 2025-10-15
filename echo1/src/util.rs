@@ -3,7 +3,7 @@ use std::{env, str::FromStr};
 
 use anyhow::{Context, Result};
 use iroh_base::SecretKey;
-use rand::thread_rng;
+use rand::rng;
 
 /// Gets a secret key from the IROH_SECRET environment variable or generates a new random one.
 /// If the environment variable is set, it must be a valid string representation of a secret key.
@@ -13,7 +13,7 @@ pub fn get_or_generate_secret_key() -> Result<SecretKey> {
         SecretKey::from_str(&secret).context("Invalid secret key format")
     } else {
         // Generate a new random key
-        let secret_key = SecretKey::generate(&mut thread_rng());
+        let secret_key = SecretKey::generate(&mut rng());
         println!(
             "Generated new secret key: {}",
             hex::encode(secret_key.to_bytes())
