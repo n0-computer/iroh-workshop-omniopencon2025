@@ -9,11 +9,11 @@ use futures::StreamExt;
 use iroh_base::SecretKey;
 use iroh_blobs::{
     api::{
-        downloader::{DownloadProgessItem, DownloadProgress},
+        downloader::{DownloadProgress, DownloadProgressItem},
         Store, TempTag,
     },
     format::collection::Collection,
-    provider::Event,
+    provider::events::{ConnectMode, EventMask, EventSender, ProviderMessage, RequestMode},
     HashAndFormat,
 };
 use rand::{rng, Rng};
@@ -192,53 +192,25 @@ pub fn crate_name() -> &'static str {
     env!("CARGO_CRATE_NAME")
 }
 
-pub fn dump_provider_events() -> (
-    tokio::task::JoinHandle<()>,
-    mpsc::Sender<iroh_blobs::provider::Event>,
-) {
+pub fn dump_provider_events() -> (tokio::task::JoinHandle<()>, EventSender) {
     let (tx, mut rx) = mpsc::channel(100);
     let dump_task = tokio::spawn(async move {
         while let Some(event) = rx.recv().await {
             match event {
-                Event::ClientConnected {
-                    node_id,
-                    connection_id,
-                    permitted,
-                } => {
-                    permitted.send(true).await.ok();
-                    println!("Client connected: {node_id} {connection_id}");
-                }
-                Event::GetRequestReceived {
-                    connection_id,
-                    request_id,
-                    hash,
-                    ranges,
-                } => {
+                ProviderMessage::ClientConnectedNotify(msg) => {
                     println!(
-                        "Get request received: {connection_id} {request_id} {hash} {ranges:?}"
+                        "Client connected: {} {}",
+                        msg.connection_id,
+                        msg.node_id
+                            .map(|x| x.fmt_short().to_string())
+                            .unwrap_or_else(|| "unknown".to_string())
                     );
                 }
-                Event::TransferCompleted {
-                    connection_id,
-                    request_id,
-                    stats,
-                } => {
-                    println!("Transfer completed: {connection_id} {request_id} {stats:?}");
-                }
-                Event::TransferAborted {
-                    connection_id,
-                    request_id,
-                    stats,
-                } => {
-                    println!("Transfer aborted: {connection_id} {request_id} {stats:?}");
-                }
-                Event::TransferProgress {
-                    connection_id,
-                    request_id,
-                    index,
-                    end_offset,
-                } => {
-                    info!("Transfer progress: {connection_id} {request_id} {index} {end_offset}");
+                ProviderMessage::GetRequestReceived(msg) => {
+                    println!(
+                        "Get request received: {} {} {} {:?}",
+                        msg.connection_id, msg.request_id, msg.request.hash, msg.request.ranges
+                    );
                 }
                 _ => {
                     info!("Received event: {:?}", event);
@@ -246,14 +218,24 @@ pub fn dump_provider_events() -> (
             }
         }
     });
-    (dump_task, tx)
+    (
+        dump_task,
+        EventSender::new(
+            tx.into(),
+            EventMask {
+                connected: ConnectMode::Notify,
+                get: RequestMode::Notify,
+                ..EventMask::DEFAULT
+            },
+        ),
+    )
 }
 
 pub async fn show_download_progress(response: DownloadProgress) -> Result<()> {
     let mut stream = response.stream().await?;
     loop {
         match stream.next().await {
-            Some(DownloadProgessItem::Progress(value)) => {
+            Some(DownloadProgressItem::Progress(value)) => {
                 print!("\rProgress: {value}");
             }
             Some(x) => {
