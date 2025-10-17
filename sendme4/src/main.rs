@@ -1,7 +1,7 @@
 use std::{env, ops::Deref, path::PathBuf, process, str::FromStr, time::Duration};
 
 use anyhow::{ensure, Context, Result};
-use iroh::{discovery, protocol::Router, Endpoint, NodeId, SecretKey, Watcher};
+use iroh::{discovery, protocol::Router, Endpoint, NodeId, SecretKey};
 use iroh_blobs::{
     api::downloader::{DownloadOptions, SplitStrategy},
     format::collection::Collection,
@@ -78,19 +78,19 @@ async fn share(path: PathBuf) -> Result<()> {
         .await?;
 
     let node_id = ep.node_id();
-    ep.home_relay().initialized().await?;
-    let addr = ep.node_addr().initialized().await?;
+    ep.online().await;
+    let addr = ep.node_addr();
 
     println!("Node ID: {node_id}");
     println!("Full address: {addr:?}");
 
     let tag = util::import(absolute_path.clone(), &blobs).await?;
     let announce_task = tokio::spawn(announce_task(
-        *tag.hash_and_format(),
+        tag.hash_and_format(),
         ep.clone(),
         secret_key,
     ));
-    let ticket = BlobTicket::new(addr, *tag.hash(), tag.format());
+    let ticket = BlobTicket::new(addr, tag.hash(), tag.format());
     println!("Sharing {}", absolute_path.display());
     println!("Hash: {}", tag.hash());
     println!(
@@ -106,7 +106,7 @@ async fn share(path: PathBuf) -> Result<()> {
     let router = Router::builder(ep.clone())
         .accept(
             iroh_blobs::ALPN,
-            BlobsProtocol::new(&blobs, ep.clone(), Some(dump_sender)),
+            BlobsProtocol::new(&blobs, Some(dump_sender)),
         )
         .spawn();
 
