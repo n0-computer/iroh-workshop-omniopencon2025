@@ -260,7 +260,7 @@ impl ContentDiscovery for TrackerDiscovery {
                     content: content.parse().unwrap(),
                     flags: QueryFlags {
                         complete: true,
-                        verified: true,
+                        verified: false,
                     },
                 };
                 println!("Querying tracker: {query:?}");

@@ -19,9 +19,9 @@ mod util;
 
 /// node ticket for the tracker
 /// local
-/// const TRACKER: &str = "b223f67b76e1853c7f76d9a9f8ce4d8dbb04a48ad9631ce52347043388475767";
+/// const TRACKER: &str = "bbf02f65196cd935b9a72b996e27d712a3e9ea832b43465f3899957b419bc6b4";
 /// arqu
-const TRACKER: &str = "69b2f535d5792b50599b51990963e0cca1041679cd968563a8bc3179a7c42e67";
+const TRACKER: &str = "4d5ffc0da0cd300fad0ee66cb7e48fdb7c2a09af9f8c0aaa897573c22ca200aa";
 
 /// periodically announce the content to the tracker
 async fn announce_task(content: HashAndFormat, ep: Endpoint, secret_key: SecretKey) -> Result<()> {
